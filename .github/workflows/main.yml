@@ -1,0 +1,31 @@
+name: Run Minecraft Server
+
+on:
+  schedule:
+    # Ejecutar el flujo de trabajo a las 8:00 AM hora local (14:00 UTC)
+    - cron: "0 14 * * *"
+  push:
+    branches:
+      - main  # Se ejecutará cuando haya un push a la rama principal
+
+jobs:
+  run-server:
+    runs-on: ubuntu-latest
+    steps:
+      # Paso para obtener el código
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Paso para configurar Docker
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v2
+
+      # Paso para construir y ejecutar el servidor de Minecraft
+      - name: Run Minecraft Server
+        run: |
+          docker build -t minecraft-bedrock .
+          docker run -d -p 19132:19132 -e EULA=TRUE minecraft-bedrock
+
+      # Paso para obtener la IP pública
+      - name: Get public IP address
+        run: curl ifconfig.me
